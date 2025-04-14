@@ -3,19 +3,32 @@ const Post = require('../models/Post');
 // @desc    Create a new post
 // @route   POST /api/posts
 // @access  Private
+const cloudinary = require('../config/cloudinary');
+const fs = require('fs');
+
 exports.createPost = async (req, res) => {
   try {
     const { category, text } = req.body;
-    const fileUrl = req.file ? req.file.path : '';
+    let fileData = { url: '', publicId: '' };
+
+    if (req.file) {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'posts', // optional folder in your Cloudinary media library
+      });
+
+      fileData.url = result.secure_url;
+      fileData.publicId = result.public_id;
+
+      // Optionally delete local file after upload
+      fs.unlinkSync(req.file.path);
+    }
 
     const post = await Post.create({
       user: req.user._id,
       category,
       text,
-      file: {
-        url: fileUrl,
-        publicId: '', 
-      },
+      file: fileData,
     });
 
     res.status(201).json(post);
@@ -34,7 +47,7 @@ exports.getPosts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const posts = await Post.find()
-      .populate('userId', 'name profilePicture')
+      .populate('user', 'name profilePicture')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -137,7 +150,7 @@ exports.addComment = async (req, res) => {
     }
 
     post.comments.push({
-      userId: req.user._id,
+      user: req.user._id,
       text,
     });
 

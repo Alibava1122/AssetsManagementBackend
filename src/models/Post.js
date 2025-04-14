@@ -14,7 +14,6 @@ const postSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Please provide a category'],
-    enum: ['crypto', 'question', 'announcement', 'help'],
   },
   file: {
     url: String,

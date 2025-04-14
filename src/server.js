@@ -59,6 +59,13 @@ app.use('/api/chat', require('./routes/chat'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/search', require('./routes/search'));
 
+// Asset Management Routes
+app.use('/api/assets', require('./routes/assets'));
+app.use('/api/crypto', require('./routes/crypto'));
+app.use('/api/real-estate', require('./routes/realEstate'));
+app.use('/api/cash', require('./routes/cash'));
+app.use('/api/stocks', require('./routes/stocks'));
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
